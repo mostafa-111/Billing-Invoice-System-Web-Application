@@ -1,0 +1,15 @@
+{
+  "server": {
+    "env": "test"
+  },
+  "database": {
+    "uri": "mongodb://localhost:27017/invoice-app-test"
+  },
+  "jwt": {
+    "secret": "test-jwt-secret-key",
+    "expiresIn": "7d"
+  },
+  "logging": {
+    "level": "error"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "server": {
+    "port": 5000,
+    "env": "production"
+  },
+  "database": {
+    "uri": "${MONGO_URI}"
+  },
+  "jwt": {
+    "secret": "${JWT_SECRET}",
+    "expiresIn": "7d"
+  },
+  "logging": {
+    "level": "warn",
+    "maxSize": "20m",
+    "maxFiles": "30d"
+  },
+  "cors": {
+    "origin": ["${FRONTEND_URL}"],
+    "credentials": true
+  },
+  "email": {
+    "service": "${EMAIL_SERVICE}",
+    "host": "${EMAIL_HOST}",
+    "port": "${EMAIL_PORT}",
+    "secure": "${EMAIL_SECURE}",
+    "user": "${EMAIL_USER}",
+    "pass": "${EMAIL_PASS}"
+  }
+}

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Invoice - InvoiceApp</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div class="dashboard-header">
+        <div class="container">
+            <div class="dashboard-nav">
+                <div class="logo">
+                    <h1>InvoiceApp</h1>
+                </div>
+                <div class="user-menu">
+                    <div class="user-info">
+                        <a href="dashboard.html" class="btn-secondary btn-small">Back to Dashboard</a>
+                        <button onclick="logout()" class="btn-secondary btn-small">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="container">
+            <div id="alert-container"></div>
+            
+            <div class="invoice-form">
+                <h2 style="margin-bottom: 2rem;">Edit Invoice</h2>
+                
+                <form id="invoice-form">
+                    <!-- Client Info -->
+                    <h3 style="margin-bottom: 1rem;">Client Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-name">Client Name *</label>
+                            <input type="text" id="client-name" name="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-email">Client Email *</label>
+                            <input type="email" id="client-email" name="clientEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-address">Client Address</label>
+                            <input type="text" id="client-address" name="clientAddress">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-phone">Client Phone</label>
+                            <input type="text" id="client-phone" name="clientPhone">
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="items-section">
+                        <div class="items-header">
+                            <h3>Items</h3>
+                            <button type="button" onclick="addItemRow()" class="btn-secondary btn-small">Add Item</button>
+                        </div>
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Item Name *</th>
+                                    <th>Description</th>
+                                    <th>Quantity *</th>
+                                    <th>Price *</th>
+                                    <th>Total</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="items-tbody">
+                                <tr class="item-row">
+                                    <td><input type="text" class="item-name" required></td>
+                                    <td><input type="text" class="item-description"></td>
+                                    <td><input type="number" class="item-quantity" min="0.01" step="0.01" value="1" required></td>
+                                    <td><input type="number" class="item-price" min="0" step="0.01" value="0" required></td>
+                                    <td class="item-total">$0.00</td>
+                                    <td><button type="button" onclick="removeItemRow(this)" class="btn-danger btn-small">Remove</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="totals-section">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tax-rate">Tax Rate (%)</label>
+                                <input type="number" id="tax-rate" name="taxRate" min="0" max="100" step="0.01" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="discount-code">Discount Code</label>
+                                <input type="text" id="discount-code" name="discountCode" placeholder="Enter discount code" style="text-transform: uppercase;">
+                                <small style="color: #6B7280; font-size: 0.875rem;">Enter a discount code to apply percentage discount</small>
+                            </div>
+                            <div class="form-group" id="admin-discount-group" style="display: none;">
+                                <label for="discount">Direct Discount ($) - Admin Only</label>
+                                <input type="number" id="discount" name="discount" min="0" step="0.01" value="0">
+                                <small style="color: #6B7280; font-size: 0.875rem;">Or enter a direct discount amount</small>
+                            </div>
+                        </div>
+                        <div class="totals-row">
+                            <strong>Subtotal:</strong>
+                            <strong id="subtotal">$0.00</strong>
+                        </div>
+                        <div class="totals-row">
+                            <strong>Tax:</strong>
+                            <strong id="tax-amount">$0.00</strong>
+                        </div>
+                        <div class="totals-row">
+                            <strong>Discount:</strong>
+                            <strong id="discount-amount">$0.00</strong>
+                        </div>
+                        <div class="totals-row total">
+                            <strong>Total:</strong>
+                            <strong id="grand-total">$0.00</strong>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div class="form-row" style="margin-top: 2rem;">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" name="status">
+                                <option value="draft">Draft</option>
+                                <option value="sent">Sent</option>
+                                <option value="paid">Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="due-date">Due Date</label>
+                            <input type="date" id="due-date" name="dueDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Update Invoice</button>
+                        <a href="dashboard.html" class="btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/invoice-form.js"></script>
+    <script>
+        // Verify auth
+        if (requireAuth()) {
+            verifyAuth().then(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const invoiceId = urlParams.get('id');
+                if (invoiceId) {
+                    loadInvoice(invoiceId);
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

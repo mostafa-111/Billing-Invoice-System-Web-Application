@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - InvoiceApp</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .admin-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #0D9488 0%, #10B981 100%);
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            letter-spacing: 0.5px;
+        }
+        .auth-card {
+            border-top: 4px solid #0D9488;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;"><h1>InvoiceApp</h1></a>
+                </div>
+                <div class="nav-links">
+                    <a href="user-login.html">User Login</a>
+                    <a href="register.html">Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="admin-badge">🔐 ADMIN ACCESS</div>
+            <h2>Admin Login</h2>
+            <p>Sign in with your admin credentials</p>
+            
+            <div id="alert-container"></div>
+            
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label for="email">Admin Email</label>
+                    <input type="email" id="email" name="email" required placeholder="admin@invoiceapp.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" required>
+                        <button type="button" class="password-toggle" id="password-toggle" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Login as Admin</button>
+                </div>
+            </form>
+            
+            <div class="auth-link">
+                <a href="user-login.html">Login as User instead</a> | 
+                <a href="index.html">Back to Home</a>
+            </div>
+            
+            <div style="margin-top: 1.5rem; padding: 1.25rem; background: #F0FDFA; border-radius: 8px; font-size: 0.9375rem; color: #4B5563; border-left: 4px solid #0D9488;">
+                <strong>Default Admin:</strong><br>
+                Email: admin@invoiceapp.com<br>
+                Password: admin123
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Password visibility toggle function
+        function togglePasswordVisibility(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈'; // Closed eye when visible
+                button.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️'; // Open eye when hidden
+                button.setAttribute('aria-label', 'Show password');
+            }
+        }
+
+        // Initialize password toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordToggle = document.getElementById('password-toggle');
+            if (passwordToggle) {
+                passwordToggle.addEventListener('click', () => {
+                    togglePasswordVisibility('password', 'password-toggle');
+                });
+            }
+        });
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            
+            try {
+                const response = await apiRequest(API_ENDPOINTS.auth.login, {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.success) {
+                    // Check if user is admin
+                    if (response.data.user.role !== 'admin') {
+                        showAlert('Access denied. This is an admin-only login. Please use user login.', 'error');
+                        return;
+                    }
+
+                    setAuthData(response.data.token, response.data.user);
+                    showAlert('Admin login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'admin-dashboard.html';
+                    }, 1000);
+                }
+            } catch (error) {
+                // Don't let the global apiRequest error handler redirect us
+                console.log('Admin login error:', error.message);
+                showAlert(error.message || 'Login failed. Please check your credentials.', 'error');
+                // Don't redirect - let user try again
+            }
+        });
+    </script>
+</body>
+</html>
+

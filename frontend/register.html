@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - InvoiceApp</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;"><h1>InvoiceApp</h1></a>
+                </div>
+                <div class="nav-links">
+                    <a href="user-login.html">User Login</a>
+                    <a href="admin-login.html">Admin Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Create Account</h2>
+            <p>Sign up to start managing your invoices</p>
+            
+            <div id="alert-container"></div>
+            
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" required minlength="6">
+                        <button type="button" class="password-toggle" id="password-toggle" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                    <div id="password-strength" class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strength-fill"></div>
+                        </div>
+                        <span id="strength-text">Password strength: Weak</span>
+                    </div>
+                    <div id="password-requirements" class="password-requirements">
+                        <div id="req-length" class="requirement unmet">At least 6 characters</div>
+                        <div id="req-uppercase" class="requirement unmet">One uppercase letter</div>
+                        <div id="req-lowercase" class="requirement unmet">One lowercase letter</div>
+                        <div id="req-number" class="requirement unmet">One number</div>
+                        <div id="req-special" class="requirement unmet">One special character (!@#$%^&*)</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm-password">Confirm Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                        <button type="button" class="password-toggle" id="confirm-password-toggle" aria-label="Toggle password visibility">
+                            👁️
+                        </button>
+                    </div>
+                    <div id="confirm-error" class="error-message" style="display: none;">Passwords do not match</div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="register-btn">Create Account</button>
+                </div>
+            </form>
+            
+            <div class="auth-link">
+                Already have an account? <a href="user-login.html">User Login</a> | <a href="admin-login.html">Admin Login</a>
+            </div>
+            <div style="margin-top: 1rem; padding: 1.25rem; background: #F0FDFA; border-radius: 8px; font-size: 0.9375rem; color: #0D9488; border-left: 4px solid #0D9488;">
+                <strong>Note:</strong> Registration creates a user account. For admin access, contact your administrator or use the default admin credentials.
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Password validation functions
+        function checkPasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 6,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+            };
+
+            return requirements;
+        }
+
+        function updatePasswordValidation(password) {
+            const requirements = checkPasswordStrength(password);
+            const strengthFill = document.getElementById('strength-fill');
+            const strengthText = document.getElementById('strength-text');
+
+            // Update requirement indicators
+            document.getElementById('req-length').classList.toggle('met', requirements.length);
+            document.getElementById('req-uppercase').classList.toggle('met', requirements.uppercase);
+            document.getElementById('req-lowercase').classList.toggle('met', requirements.lowercase);
+            document.getElementById('req-number').classList.toggle('met', requirements.number);
+            document.getElementById('req-special').classList.toggle('met', requirements.special);
+
+            // Calculate strength
+            const metCount = Object.values(requirements).filter(Boolean).length;
+            let strength = 0;
+            let strengthClass = 'weak';
+            let strengthTextValue = 'Password strength: Weak';
+
+            if (metCount >= 2) {
+                strength = 25;
+                strengthClass = 'weak';
+                strengthTextValue = 'Password strength: Weak';
+            }
+            if (metCount >= 3) {
+                strength = 50;
+                strengthClass = 'fair';
+                strengthTextValue = 'Password strength: Fair';
+            }
+            if (metCount >= 4) {
+                strength = 75;
+                strengthClass = 'good';
+                strengthTextValue = 'Password strength: Good';
+            }
+            if (metCount >= 5) {
+                strength = 100;
+                strengthClass = 'strong';
+                strengthTextValue = 'Password strength: Strong';
+            }
+
+            // Update strength bar
+            strengthFill.style.width = strength + '%';
+            strengthFill.className = 'strength-fill ' + strengthClass;
+            strengthText.textContent = strengthTextValue;
+        }
+
+        function validatePasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const confirmError = document.getElementById('confirm-error');
+            const registerBtn = document.getElementById('register-btn');
+
+            if (confirmPassword && password !== confirmPassword) {
+                confirmError.style.display = 'block';
+                registerBtn.disabled = true;
+                return false;
+            } else {
+                confirmError.style.display = 'none';
+                registerBtn.disabled = false;
+                return true;
+            }
+        }
+
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const requirements = checkPasswordStrength(password);
+
+            const allRequirementsMet = Object.values(requirements).every(Boolean);
+            const passwordsMatch = password === confirmPassword;
+            const passwordNotEmpty = password.length > 0;
+            const confirmNotEmpty = confirmPassword.length > 0;
+
+            const registerBtn = document.getElementById('register-btn');
+            registerBtn.disabled = !(allRequirementsMet && passwordsMatch && passwordNotEmpty && confirmNotEmpty);
+
+            return allRequirementsMet && passwordsMatch;
+        }
+
+        // Password visibility toggle function
+        function togglePasswordVisibility(inputId, buttonId) {
+            const input = document.getElementById(inputId);
+            const button = document.getElementById(buttonId);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                button.textContent = '🙈'; // Closed eye when visible
+                button.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                button.textContent = '👁️'; // Open eye when hidden
+                button.setAttribute('aria-label', 'Show password');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const passwordToggle = document.getElementById('password-toggle');
+            const confirmPasswordToggle = document.getElementById('confirm-password-toggle');
+
+            // Password visibility toggles
+            passwordToggle.addEventListener('click', () => {
+                togglePasswordVisibility('password', 'password-toggle');
+            });
+
+            confirmPasswordToggle.addEventListener('click', () => {
+                togglePasswordVisibility('confirm-password', 'confirm-password-toggle');
+            });
+
+            // Password input validation
+            passwordInput.addEventListener('input', (e) => {
+                updatePasswordValidation(e.target.value);
+                validatePasswordMatch();
+                validateForm();
+            });
+
+            // Confirm password validation
+            confirmPasswordInput.addEventListener('input', () => {
+                validatePasswordMatch();
+                validateForm();
+            });
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                showAlert('Please ensure all password requirements are met and passwords match.', 'error');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value
+            };
+
+            // Additional validation
+            if (!formData.name) {
+                showAlert('Please enter your full name.', 'error');
+                return;
+            }
+
+            if (!formData.email) {
+                showAlert('Please enter your email address.', 'error');
+                return;
+            }
+
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.email)) {
+                showAlert('Please enter a valid email address.', 'error');
+                return;
+            }
+
+            try {
+                await registerUser(formData);
+            } catch (error) {
+                showAlert('Registration failed. Please try again.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
+
